@@ -16,6 +16,11 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^', include('df_user.urls')),
+    url(r'^', include('goods.urls')),
+    url(r'^', include('user_center.urls')),
+
 ]
