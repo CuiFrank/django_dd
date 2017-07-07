@@ -1,80 +1,51 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>天天生鲜-用户中心</title>
-	<link rel="stylesheet" type="text/css" href="css/reset.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
-</head>
-<body>
-	<div class="header_con">
-		<div class="header">
-			<div class="welcome fl">欢迎来到天天生鲜!</div>
-			<div class="fr">
-				<div class="login_info fl">
-					欢迎您：<em>张 山</em>
-				</div>
-				<div class="login_btn fl">
-					<a href="login.html">登录</a>
-					<span>|</span>
-					<a href="register.html">注册</a>
-				</div>
-				<div class="user_link fl">
-					<span>|</span>
-					<a href="user_center_info.html">用户中心</a>
-					<span>|</span>
-					<a href="cart.html">我的购物车</a>
-					<span>|</span>
-					<a href="user_center_order.html">我的订单</a>
-				</div>
-			</div>
-		</div>		
-	</div>
+{%extends 'base.html'%}
+{%block first_line%}
+{%if first_line == '1'%}
+{{block.super}}
+{%endif%}
+{%endblock first_line%}
 
-	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="images/logo.png"></a>
-		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
-		<div class="search_con fr">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>		
-	</div>
+	{% block second_line %}
+	{{block.super}}
+	{% endblock second_line %}
 
-	<div class="main_con clearfix">
-		<div class="left_menu_con clearfix">
-			<h3>用户中心</h3>
-			<ul>
-				<li><a href="user_center_info.html">· 个人信息</a></li>
-				<li><a href="user_center_order.html">· 全部订单</a></li>
-				<li><a href="user_center_site.html" class="active">· 收货地址</a></li>
-			</ul>
-		</div>
+	{% block left%}
+	{% if first_line == '1'%}
+	{{block.super}}
+<script> $(function(){
+	    $('.left_menu_con ul li').eq(2).children().addClass('active')})</script>
+	{% endif%}
+	{% endblock left%}
+
+{% block body %}
+
 		<div class="right_content clearfix">
 				<h3 class="common_title2">收货地址</h3>
 				<div class="site_con">
 					<dl>
 						<dt>当前地址：</dt>
-						<dd>北京市 海淀区 东北旺西路8号中关村软件园 （李思 收） 182****7528</dd>
+						<dd>{{user.name}}&nbsp;详细：{{user.address}}&nbsp;电话：{{user.phone}}&nbsp;邮编：{{user.code}}</dd>
 					</dl>					
 				</div>
 				<h3 class="common_title2">编辑地址</h3>
 				<div class="site_con">
-					<form>
+					<form id="post_form"  method="post" action="/center/post_site/">
+						{%csrf_token%}
 						<div class="form_group">
 							<label>收件人：</label>
-							<input type="text" name="">
+							<input type="text" name="receive_man" id="receive_man" value="{{user.name}}">
 						</div>
 						<div class="form_group form_group2">
 							<label>详细地址：</label>
-							<textarea class="site_area"></textarea>
+							<textarea class="site_area" name="receive_area" id="receive_area" >{{user.address}}</textarea>
 						</div>
 						<div class="form_group">
 							<label>邮编：</label>
-							<input type="text" name="">
+							<input type="text" name="receive_code" id="receive_code" value="{{user.code}}">
 						</div>
 						<div class="form_group">
 							<label>手机：</label>
-							<input type="text" name="">
+							<input type="text" name="receive_phone" id="receive_phone" value="{{user.phone}}">
 						</div>
 
 						<input type="submit" name="" value="提交" class="info_submit">
@@ -82,22 +53,22 @@
 				</div>
 		</div>
 	</div>
+<script>
+	$(function(){
+	    $('#post_form').submit(function(){
+	        rman = $('#receive_man').val()
+			rarea = $('#receive_area').val()
+			rcode = $('#receive_code').val()
+			rphone = $('#receive_phone').val()
+			list = {'rman':rman, 'rarea':rarea, 'rcode':rcode, 'rphone':rphone}
+			$.post('/center/post_site/',list, function(dat){
+			    if(dat.res == 'ok')
+			    $('.site_con dl dd').html(rman +'&nbsp;' +rarea+'&nbsp;' +rphone)
+			})
+			return false
 
+		})
+	})
+</script>
 
-
-	<div class="footer">
-		<div class="foot_link">
-			<a href="#">关于我们</a>
-			<span>|</span>
-			<a href="#">联系我们</a>
-			<span>|</span>
-			<a href="#">招聘人才</a>
-			<span>|</span>
-			<a href="#">友情链接</a>		
-		</div>
-		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
-		<p>电话：010-****888    京ICP备*******8号</p>
-	</div>
-	
-</body>
-</html>
+{%endblock body%}
