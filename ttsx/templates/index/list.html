@@ -1,0 +1,125 @@
+{% extends 'index/base.html' %}
+{% block head%}
+{% endblock head%}
+
+
+{% block first_line%}
+{{block.super}}
+{% endblock first_line%}
+
+	{% block second_line %}
+	{{block.super}}
+
+	{% endblock second_line %}
+
+{% block left%}
+{% endblock left%}
+
+
+	{%block body%}
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>
+				<span></span>
+				{% block nav %}
+				{{block.super}}
+				{% endblock nav %}
+			</div>
+			{% block navlist%}
+			{{block.super}}
+			{% endblock navlist%}
+		</div>
+	</div>
+	<div class="breadcrumb">
+		<a href="#">全部分类</a>
+		<span>></span>
+		<a href="#">{{kind.kinds}}</a>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					{% for new in newlist%}
+					<li>
+						<a href="#"><img src="/static/media/{{new.pic}}"></a>
+						<h4><a href="#">{{new.title}}</a></h4>
+						<div class="prize">￥{{new.price}}</div>
+					</li>
+					{% endfor %}
+
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<div class="sort_bar">
+				<a href="#" class="active">默认</a>
+				<a href="#">价格</a>
+				<a href="#">人气</a>
+			</div>
+
+			<ul class="goods_type_list clearfix">
+
+				{% for goods in page.object_list %}
+				<li>
+					<a href="/list/{{uid}}/detail/{{goods.id}}/"><img src="/static/media/{{goods.pic}}"></a>
+					<h4><a href="detail.html">{{goods.title}}</a></h4>
+					<div class="operate">
+						<span class="prize">￥{{goods.price}}</span>
+						<span class="unit">{{goods.price}}/{{goods.unit}}</span>
+						<a href="#" class="add_goods" title="加入购物车"></a>
+					</div>
+				</li>
+				{% endfor %}
+			</ul>
+			<div class="pagenation">
+				<a href="#" class="up"><上一页</a>
+				{% for pindex in page.paginator.page_range %}
+					{% if pindex == page.number %}
+					<a href="#" class="active" id="now">{{ pindex }}</a>
+
+					{% else %}
+					<a href="/list/{{uid}}/{{ pindex }}/" > {{ pindex }}</a>
+
+					{% endif %}
+				{% endfor %}
+
+				<a href="#" class="down">下一页></a>
+			</div>
+
+
+
+
+		</div>
+	</div>
+<script>
+	$(function(){
+				//向上翻页
+				$('.up').click(function(){
+				    now = $('#now').text()
+
+					if(parseInt(now)<=1){
+				        $('.up').prop({'href':'/list/{{uid}}/1/'})
+					}
+					else{
+					    $('.up').prop({'href':'/list/{{uid}}/'+(parseInt(now)-1)+'/'})
+					}
+				})
+				//向下翻页
+				$('.down').click(function(){
+				    now = $('#now').text()
+					if(parseInt(now) >= parseInt({{last_index}}))
+					{$('.down').prop({'href':'/list/{{uid}}/'+{{last_index}}+'/'})}
+					else{
+				        $('.down').prop({'href':'/list/{{uid}}/'+(parseInt(now)+1)+'/'})
+					}
+				})
+
+
+			})
+</script>
+
+	{%endblock body%}

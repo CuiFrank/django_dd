@@ -1,7 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'index/base.html' %}
 {% block head%}
-	<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="/static/js/slide.js"></script>
+	{{block.super}}
 {% endblock head%}
 
 {% block first_line %}
@@ -12,22 +11,12 @@
 
 
 	{% block second_line %}
-	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="/static/images/logo.png"></a>
-		<div class="search_con fl">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>
-		<div class="guest_cart fr">
-			<a href="#" class="cart_name fl">我的购物车</a>
-			<div class="goods_count fl" id="show_count">1</div>
-		</div>
-	</div>
+	{{block.super}}
 
 	{% endblock second_line %}
 
 {% block left%}
-<div class="main_con clearfix">
+{{block.super}}
 {% endblock left%}
     {% block body%}
 
@@ -36,25 +25,16 @@
 	<div class="navbar_con">
 		<div class="navbar">
 			<h1 class="fl">全部商品分类</h1>
-			<ul class="navlist fl">
-				<li><a href="">首页</a></li>
-				<li class="interval">|</li>
-				<li><a href="">手机生鲜</a></li>
-				<li class="interval">|</li>
-				<li><a href="">抽奖</a></li>
-			</ul>
+			{% block navlist%}
+			{{block.super}}
+			{% endblock navlist%}
 		</div>
 	</div>
 
 	<div class="center_con clearfix">
-		<ul class="subnav fl">
-			<li><a href="#model01" class="fruit">新鲜水果</a></li>
-			<li><a href="#model02" class="seafood">海鲜水产</a></li>
-			<li><a href="#model03" class="meet">猪牛羊肉</a></li>
-			<li><a href="#model04" class="egg">禽类蛋品</a></li>
-			<li><a href="#model05" class="vegetables">新鲜蔬菜</a></li>
-			<li><a href="#model06" class="ice">速冻食品</a></li>
-		</ul>
+		{% block nav %}
+		{{block.super}}
+		{% endblock nav %}
 		<div class="slide fl">
 			<ul class="slide_pics">
 				<li><img src="/static/images/slide.jpg" alt="幻灯片"></li>
@@ -78,7 +58,7 @@
 			<div class="subtitle fl">
 				<span>|</span>
 				{%for goods in dic.clicklist%}
-				<a href="/{{goods.id}}/">{{goods.title| truncatechars:10}}</a>
+				<a href="/list/{{dic.t1.id}}/1/">{{goods.title| truncatechars:10}}</a>
 				{%endfor%}
 
 			</div>
@@ -90,8 +70,8 @@
 			<ul class="goods_list fl">
 				{% for goods in dic.newlist%}
 				<li>
-					<h4><a href="/{{goods.id}}/">{{goods.title}}</a></h4>
-					<a href="/{{goods.id}}/"><img src="/static/media/{{goods.pic}}"></a>
+					<h4><a href="/list/{{dic.t1.id}}/1/">{{goods.title}}</a></h4>
+					<a href="/list/{{dic.t1.id}}/1/"><img src="/static/media/{{goods.pic}}"></a>
 					<div class="prize">¥ {{goods.price}}</div>
 				</li>
 				{% endfor %}

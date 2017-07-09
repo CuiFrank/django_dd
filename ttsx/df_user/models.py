@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class UserInfo(models.Model):
     name = models.CharField(max_length=20)
@@ -17,3 +18,14 @@ class PostInfo(models.Model):
 
     post_name = models.ForeignKey(UserInfo)
 
+
+class CartInfo(models.Model):
+    title = models.CharField(max_length=100, null=True)
+    pic = models.ImageField(upload_to='goods/', default='')
+    price = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    unit = models.CharField(max_length=20, null=True)
+    isDelete = models.BooleanField(default=False)
+    num = models.IntegerField(default=0)
+    total = models.DecimalField(max_digits=12, decimal_places=2)
+    user = models.ForeignKey('UserInfo')
+    goods_id = models.IntegerField(default=200)

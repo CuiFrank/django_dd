@@ -1,47 +1,23 @@
+{% extends 'base.html' %}
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title> {{title}} </title>
-	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
-</head>
-<body>
-	<div class="header_con">
-		<div class="header">
-			<div class="welcome fl">欢迎来到天天生鲜!</div>
-			<div class="fr">
-				<div class="login_info fl">
-					欢迎您：<em>张 山</em>
-				</div>
-				<div class="login_btn fl">
-					<a href="login.html">登录</a>
-					<span>|</span>
-					<a href="register.html">注册</a>
-				</div>
-				<div class="user_link fl">
-					<span>|</span>
-					<a href="user_center_info.html">用户中心</a>
-					<span>|</span>
-					<a href="cart.html">我的购物车</a>
-					<span>|</span>
-					<a href="user_center_order.html">我的订单</a>
-				</div>
-			</div>
-		</div>
-	</div>
+	{% block first_line%}
+	{% if first_line == '1'%}
+	{{block.super}}
+	{% endif%}
+	{% endblock first_line%}
 
-	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="images/logo.png"></a>
-		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
-		<div class="search_con fr">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>
-	</div>
+	{% block second_line %}
+	{{block.super}}
+	{% endblock second_line %}
 
-	<div class="total_count">全部商品<em>2</em>件</div>	
+{% block left%}
+{% endblock left%}
+
+
+{% block body%}
+
+
+	<div class="total_count">全部商品<em>{{num}}</em>件</div>
 	<ul class="cart_list_th clearfix">
 		<li class="col01">商品名称</li>
 		<li class="col02">商品单位</li>
@@ -50,62 +26,226 @@
 		<li class="col05">小计</li>
 		<li class="col06">操作</li>
 	</ul>
-	<ul class="cart_list_td clearfix">
-		<li class="col01"><input type="checkbox" name="" checked></li>
-		<li class="col02"><img src="images/goods/goods012.jpg"></li>
-		<li class="col03">奇异果<br><em>25.80元/500g</em></li>
-		<li class="col04">500g</li>
-		<li class="col05">25.80元</li>
-		<li class="col06">
-			<div class="num_add">
-				<a href="javascript:;" class="add fl">+</a>
-				<input type="text" class="num_show fl" value="1">	
-				<a href="javascript:;" class="minus fl">-</a>	
-			</div>
-		</li>
-		<li class="col07">25.80元</li>
-		<li class="col08"><a href="javascript:;">删除</a></li>
-	</ul>
 
+	{% for c in cartlist %}
 	<ul class="cart_list_td clearfix">
-		<li class="col01"><input type="checkbox" name="" checked></li>
-		<li class="col02"><img src="images/goods/goods003.jpg"></li>
-		<li class="col03">大兴大棚草莓<br><em>16.80元/500g</em></li>
-		<li class="col04">500g</li>
-		<li class="col05">16.80元</li>
+		<li class="col01"><input type="checkbox" name="left_check" checked></li>
+		<li class="col02"><img src="/static/media/{{c.cart_good.pic}}/"></li>
+		<li class="col03">{{c.cart_good.title}}<br><em>{{c.cart_good.price}}元/{{c.cart_good.unit}}</em></li>
+		<li class="col04">{{c.cart_good.unit}}</li>
+		<li class="col05"><span>{{c.cart_good.price}}</span>元</li>
 		<li class="col06">
+			<p style="display:none">{{c.rest}}</p>
 			<div class="num_add">
-				<a href="javascript:;" class="add fl">+</a>
-				<input type="text" class="num_show fl" value="1">	
-				<a href="javascript:;" class="minus fl">-</a>	
+				<span href="javascript:;" class="add fl">+</span>
+				<input type="text" class="num_show fl" value="{{c.cart_good.num}}">
+				<span href="javascript:;" class="minus fl">-</span>
+				<p>{{c.cart_good.id}}</p>
 			</div>
 		</li>
-		<li class="col07">16.80元</li>
-		<li class="col08"><a href="javascript:;">删除</a></li>
+		<li class="col07"><span>{{c.cart_good.total}}</span>元</li>
+		<li class="col08"><span>删除</span><p >{{c.cart_good.id}}</p></li>
+
 	</ul>
+	{% endfor %}
+
 	
 
 	<ul class="settlements">
-		<li class="col01"><input type="checkbox" name="" checked=""></li>
+		<li class="col01"><input type="checkbox" name="sub_check" checked=""></li>
 		<li class="col02">全选</li>
-		<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em>{{tot}}</em><br>共计<b id="num">{{num}}</b>件商品</li>
 		<li class="col04"><a href="place_order.html">去结算</a></li>
 	</ul>
 
+<script>
+	$(function(){
+	    $('.add').click(function(){
+	        // 获取到add下面的数量显示框对象，获取小计的对象
+	        $show = $(this).next()
+			$now_money = $(this).parent().parent().next().find('span')
+			$price_money = $(this).parent().parent().prev().find('span')
+	        now = parseInt($show.val())
+			now_money = parseFloat($now_money.text()) + parseFloat($price_money.text())
 
-	<div class="footer">
-		<div class="foot_link">
-			<a href="#">关于我们</a>
-			<span>|</span>
-			<a href="#">联系我们</a>
-			<span>|</span>
-			<a href="#">招聘人才</a>
-			<span>|</span>
-			<a href="#">友情链接</a>
-		</div>
-		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
-		<p>电话：010-****888    京ICP备*******8号</p>
-	</div>
-	
-</body>
-</html>
+			// 获取总计的数值
+			tot = $('.settlements .col03 em').text()
+
+			rest = $(this).parent().prev().text()
+			if(now>=parseInt(rest)){
+	            $show.val(rest)
+				$now_money.text(parseFloat($price_money.text())*rest)
+			}
+			else{
+			    $show.val(now +1)
+				$now_money.text(now_money.toFixed(2))
+				//$('.settlements .col03 em').text((parseFloat(tot)+parseFloat($price_money.text())).toFixed(2))
+			}
+
+			tot_money = add_total()
+			$('.settlements .col03 em').text(tot_money)
+
+			tot_num = add_num()
+			$('#num').text(tot_num)
+
+		});
+	    $('.minus').click(function(){
+	        // 获取到add下面的数量显示框对象，获取小计的对象
+			$show = $(this).prev()
+			$now_money = $(this).parent().parent().next().find('span')
+			$price_money = $(this).parent().parent().prev().find('span')
+	        now = parseInt($show.val())
+			now_money = parseFloat($now_money.text()) - parseFloat($price_money.text())
+
+			// 获取总计的数值
+			tot = $('.settlements .col03 em').text()
+
+			if(now <= 0){
+			    $show.val(0)
+				$now_money.text('0.00')
+			}
+			else{
+			    $show.val(now -1)
+				$now_money.text(now_money.toFixed(2))
+				//$('.settlements .col03 em').text((parseFloat(tot)-parseFloat($price_money.text())).toFixed(2))
+
+			}
+
+			tot_money = add_total()
+			$('.settlements .col03 em').text(tot_money)
+
+			tot_num = add_num()
+			$('#num').text(tot_num)
+		});
+
+		// input框获取焦点时，记录input框的数值和后面的小计
+		input_num = 0;
+		input_money = 0;
+
+		$('.num_show').focus(function(){
+		    input_num = $(this).val()
+			input_money = $(this).parent().parent().next().find('span').text()
+		});
+		// 获取input框的值，当失去焦点时，更改小计的值
+		$('.num_show').blur(function(){
+		    now = $(this).val()
+			if(isNaN(now)){
+		        $(this).val(input_num)
+				$(this).parent().parent().next().find('span').text(input_money)
+			}
+			else if(now<0){
+			    $(this).val(input_num)
+				$(this).parent().parent().next().find('span').text(input_money)
+			}
+			else{
+			    rest = $(this).parent().prev().text()
+				$now_money = $(this).parent().parent().next().find('span')
+				$price_money = $(this).parent().parent().prev().find('span')
+				if(now>=parseInt(rest)){
+					$(this).val(rest)
+					$now_money.text((parseFloat($price_money.text())*rest).toFixed(2))
+				}
+				else{
+					$(this).val(now)
+					$now_money.text((parseFloat($price_money.text())*now).toFixed(2))
+
+				}
+				tot_money = add_total()
+				$('.settlements .col03 em').text(tot_money)
+
+				tot_num = add_num()
+				$('#num').text(tot_num)
+			}
+		});
+
+		// 计算总计的函数，就是把所有的小计的值，取出来并加和计算
+		function add_total(){
+	        len = $('.col07 span').length
+			total_money = 0.00
+			for(var i=0;i<len;i++){
+	            total_money += parseFloat($('.col07 span').eq(i).text())
+			}
+			return total_money.toFixed(2)
+		};
+
+		// 计算总计多少件数
+		function add_num(){
+		    len = $('.num_show').length
+			total_num = 0
+			for(var i=0;i<len;i++){
+	            total_num += parseInt($('.num_show').eq(i).val())
+			}
+			return total_num
+
+		};
+
+//		删除时，发生click事件，发送ajax给服务器，删除此条数据
+		$('.col08 span').click(function(){
+		    // 定义全局变量，这样ajax的回调函数才能确定这个对象然后进行操作，否则无法确定this
+		    $ul = $(this).parent().parent()
+		    $.get('/center/cart_del/', {'gid':$(this).next().text()}, function(dat){
+				if(dat.res == 'ok'){
+				    $ul.hide();
+				    $('.total_count em').text($('.total_count em').text()-1)
+//					console.log($('input[name=left_check]').length)
+
+				}
+			})
+		});
+
+
+		// 确定是否勾选，然后进行加减
+		$('.cart_list_td .col01 input').click(function(){
+		    //console.log($(this).is(':checked'))
+			gprice = $(this).parent().parent().find('.col07').find('span').text()
+			tprice = $('.settlements .col03 em').text()
+
+
+			if (!$(this).is(':checked') ) {
+				//console.log($('#num').text()-1)
+				// 如果取消选择，则下方的总计数就少一个
+				tot_n = $(this).parent().parent().find('.col06').find('.num_add').find('input').val()
+				$('#num').text($('#num').text() - tot_n)
+				// 取出这个商品的总价，让下方的总价减去这个
+				tot = $(this).parent().parent().find('.col07').find('span').text()
+
+				$('.settlements .col03 em').text((tprice * 100 - tot * 100) / 100)
+			}
+			else if ($(this).is(':checked') ) {
+				//console.log(parseInt($('#num').text())+1)
+				tot_n = $(this).parent().parent().find('.col06').find('.num_add').find('input').val()
+				$('#num').text(parseInt($('#num').text()) + parseInt(tot_n))
+
+				tot = $(this).parent().parent().find('.col07').find('span').text()
+				$('.settlements .col03 em').text((tprice * 100 + tot * 100) / 100)
+			}
+
+
+
+		});
+
+		//下方全选按钮，或者反选全部
+		$('[name="sub_check"]').click(function(){
+		    if(! $('[name="sub_check"]').is(':checked')){
+		        $('[name="left_check"]').removeAttr('checked')
+				$('#num').text(0)
+				$('.settlements .col03 em').text('0.00')
+			}
+			else{
+		        $('[name="left_check"]').prop('checked', 'true')
+
+				to_money = add_total()
+				$('.settlements .col03 em').text(to_money)
+
+				tot_num = add_num()
+				$('#num').text(tot_num)
+
+			}
+
+		});
+	});
+
+
+
+</script>
+{% endblock body%}

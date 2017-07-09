@@ -67,7 +67,7 @@ def login_handle(request):
             # response = redirect('/center/user_center_info/')
             response = redirect(request.session['url_path'])
         else:
-            response = redirect('/user/login/')
+            response = redirect('/')
         request.session['name'] = user[0].name
         response.set_cookie('isLogin', user[0].id, expires=300)
 

@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from tinymce.models import HTMLField
+
 # Create your models here.
 
 
@@ -26,3 +27,5 @@ class GoodsInfo(models.Model):
     rest = models.IntegerField(default=100)
     detail = HTMLField(default='')
     type = models.ForeignKey('KindsInfo')
+
+
