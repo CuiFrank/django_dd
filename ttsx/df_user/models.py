@@ -1,4 +1,5 @@
 from django.db import models
+from goods.models import *
 
 
 # Create your models here.
@@ -29,3 +30,7 @@ class CartInfo(models.Model):
     total = models.DecimalField(max_digits=12, decimal_places=2)
     user = models.ForeignKey('UserInfo')
     goods_id = models.IntegerField(default=200)
+
+
+
+

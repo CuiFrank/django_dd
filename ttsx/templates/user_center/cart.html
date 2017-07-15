@@ -16,7 +16,7 @@
 
 {% block body%}
 
-
+<script src="/static/js/csrf_token.js"></script>
 	<div class="total_count">全部商品<em>{{num}}</em>件</div>
 	<ul class="cart_list_th clearfix">
 		<li class="col01">商品名称</li>
@@ -27,9 +27,11 @@
 		<li class="col06">操作</li>
 	</ul>
 
+<form method='post' action="/center/place_order/" id="order">
+	{% csrf_token %}
 	{% for c in cartlist %}
 	<ul class="cart_list_td clearfix">
-		<li class="col01"><input type="checkbox" name="left_check" checked></li>
+		<li class="col01"><input type="checkbox" name="left_check" value="{{c.cart_good.id}}" checked></li>
 		<li class="col02"><img src="/static/media/{{c.cart_good.pic}}/"></li>
 		<li class="col03">{{c.cart_good.title}}<br><em>{{c.cart_good.price}}元/{{c.cart_good.unit}}</em></li>
 		<li class="col04">{{c.cart_good.unit}}</li>
@@ -49,73 +51,91 @@
 	</ul>
 	{% endfor %}
 
-	
 
 	<ul class="settlements">
-		<li class="col01"><input type="checkbox" name="sub_check" checked=""></li>
+		<li class="col01"><input type="checkbox" id="check_all" name="sub_check" checked=""></li>
 		<li class="col02">全选</li>
 		<li class="col03">合计(不含运费)：<span>¥</span><em>{{tot}}</em><br>共计<b id="num">{{num}}</b>件商品</li>
-		<li class="col04"><a href="place_order.html">去结算</a></li>
+		<li class="col04"><input type="submit" value="去结算"></input></li>
 	</ul>
 
+</form>
 <script>
 	$(function(){
 	    $('.add').click(function(){
-	        // 获取到add下面的数量显示框对象，获取小计的对象
-	        $show = $(this).next()
-			$now_money = $(this).parent().parent().next().find('span')
-			$price_money = $(this).parent().parent().prev().find('span')
-	        now = parseInt($show.val())
-			now_money = parseFloat($now_money.text()) + parseFloat($price_money.text())
+	        var $item = $(this)
+	        if(judge_check($item)){
+				// 获取到add下面的数量显示框对象，获取小计的对象
+				$show = $(this).next()
+				$now_money = $(this).parent().parent().next().find('span')
+				$price_money = $(this).parent().parent().prev().find('span')
+				now = parseInt($show.val())
+				now_money = parseFloat($now_money.text()) + parseFloat($price_money.text())
+				tot_add = parseInt($('#num').text())
 
-			// 获取总计的数值
-			tot = $('.settlements .col03 em').text()
 
-			rest = $(this).parent().prev().text()
-			if(now>=parseInt(rest)){
-	            $show.val(rest)
-				$now_money.text(parseFloat($price_money.text())*rest)
-			}
-			else{
-			    $show.val(now +1)
-				$now_money.text(now_money.toFixed(2))
-				//$('.settlements .col03 em').text((parseFloat(tot)+parseFloat($price_money.text())).toFixed(2))
-			}
+				// 获取总计的数值
+				tot = $('.settlements .col03 em').text()
 
-			tot_money = add_total()
-			$('.settlements .col03 em').text(tot_money)
+				rest = $(this).parent().prev().text()
+				if(now>=parseInt(rest)){
+					$show.val(rest)
+					$now_money.text(parseFloat($price_money.text())*rest)
+				}
+				else{
+					$show.val(now +1)
+					$now_money.text(now_money.toFixed(2))
+					$('.settlements .col03 em').text((parseFloat(tot)+parseFloat($price_money.text())).toFixed(2))
+					$('#num').text(tot_add +1)
+				}
 
-			tot_num = add_num()
-			$('#num').text(tot_num)
+				// 发送ajax给数据库，进行增加
+				gid = $(this).nextAll('p').text()
+				$.post('/center/cart_add_one/',{'count_one':$show.val(), 'tot_one':$now_money.text(),
+					'gid':gid},
+					function(dat){})
+
+//				tot_money = add_total()
+//				$('.settlements .col03 em').text(tot_money)
+//
+//				tot_num = add_num()
+//				$('#num').text(tot_num)
+				}
+
 
 		});
 	    $('.minus').click(function(){
-	        // 获取到add下面的数量显示框对象，获取小计的对象
-			$show = $(this).prev()
-			$now_money = $(this).parent().parent().next().find('span')
-			$price_money = $(this).parent().parent().prev().find('span')
-	        now = parseInt($show.val())
-			now_money = parseFloat($now_money.text()) - parseFloat($price_money.text())
+	        var $item = $(this)
+	        if(judge_check($item)){
+	            // 获取到add下面的数量显示框对象，获取小计的对象
+				$show = $(this).prev()
+				$now_money = $(this).parent().parent().next().find('span')
+				$price_money = $(this).parent().parent().prev().find('span')
+				now = parseInt($show.val())
+				now_money = parseFloat($now_money.text()) - parseFloat($price_money.text())
+				tot_minus = parseInt($('#num').text())
 
-			// 获取总计的数值
-			tot = $('.settlements .col03 em').text()
 
-			if(now <= 0){
-			    $show.val(0)
-				$now_money.text('0.00')
-			}
-			else{
-			    $show.val(now -1)
-				$now_money.text(now_money.toFixed(2))
-				//$('.settlements .col03 em').text((parseFloat(tot)-parseFloat($price_money.text())).toFixed(2))
+				// 获取总计的数值
+				tot = $('.settlements .col03 em').text()
 
-			}
+				if(now <= 0){
+					$show.val(0)
+					$now_money.text('0.00')
+				}
+				else{
+					$show.val(now -1)
+					$now_money.text(now_money.toFixed(2))
+					$('.settlements .col03 em').text((parseFloat(tot)-parseFloat($price_money.text())).toFixed(2))
+					$('#num').text(tot_minus-1)
+				}
 
-			tot_money = add_total()
-			$('.settlements .col03 em').text(tot_money)
-
-			tot_num = add_num()
-			$('#num').text(tot_num)
+//				tot_money = add_total()
+//				$('.settlements .col03 em').text(tot_money)
+//
+//				tot_num = add_num()
+//				$('#num').text(tot_num)
+				}
 		});
 
 		// input框获取焦点时，记录input框的数值和后面的小计
@@ -128,34 +148,41 @@
 		});
 		// 获取input框的值，当失去焦点时，更改小计的值
 		$('.num_show').blur(function(){
-		    now = $(this).val()
-			if(isNaN(now)){
-		        $(this).val(input_num)
-				$(this).parent().parent().next().find('span').text(input_money)
-			}
-			else if(now<0){
-			    $(this).val(input_num)
-				$(this).parent().parent().next().find('span').text(input_money)
-			}
-			else{
-			    rest = $(this).parent().prev().text()
-				$now_money = $(this).parent().parent().next().find('span')
-				$price_money = $(this).parent().parent().prev().find('span')
-				if(now>=parseInt(rest)){
-					$(this).val(rest)
-					$now_money.text((parseFloat($price_money.text())*rest).toFixed(2))
+		    var $item = $(this)
+			if(judge_check($item)){
+		        now = $(this).val()
+				if(isNaN(now)){
+					$(this).val(input_num)
+					$(this).parent().parent().next().find('span').text(input_money)
+				}
+				else if(now<0){
+					$(this).val(input_num)
+					$(this).parent().parent().next().find('span').text(input_money)
 				}
 				else{
-					$(this).val(now)
-					$now_money.text((parseFloat($price_money.text())*now).toFixed(2))
+					rest = $(this).parent().prev().text()
+					$now_money = $(this).parent().parent().next().find('span')
+					$price_money = $(this).parent().parent().prev().find('span')
+					if(now>=parseInt(rest)){
+						$(this).val(rest)
+						$now_money.text((parseFloat($price_money.text())*rest).toFixed(2))
+					}
+					else{
+						$(this).val(now)
+						$now_money.text((parseFloat($price_money.text())*now).toFixed(2))
 
+					}
+					tot_money = add_total()
+					$('.settlements .col03 em').text(tot_money)
+
+					tot_num = add_num()
+					$('#num').text(tot_num)
 				}
-				tot_money = add_total()
-				$('.settlements .col03 em').text(tot_money)
-
-				tot_num = add_num()
-				$('#num').text(tot_num)
 			}
+			else{
+			    $(this).val(input_num)
+			}
+
 		});
 
 		// 计算总计的函数，就是把所有的小计的值，取出来并加和计算
@@ -163,7 +190,11 @@
 	        len = $('.col07 span').length
 			total_money = 0.00
 			for(var i=0;i<len;i++){
-	            total_money += parseFloat($('.col07 span').eq(i).text())
+	            flag = $('.col07 span').eq(i).parent().prevAll('.col01').find('input').is(':checked')
+	            if(flag){
+	                total_money += parseFloat($('.col07 span').eq(i).text())
+				}
+
 			}
 			return total_money.toFixed(2)
 		};
@@ -173,32 +204,53 @@
 		    len = $('.num_show').length
 			total_num = 0
 			for(var i=0;i<len;i++){
-	            total_num += parseInt($('.num_show').eq(i).val())
+		        flag = $('.num_show').eq(i).parent().parent().prevAll('.col01').find('input').is(':checked')
+				if(flag){
+		            total_num += parseInt($('.num_show').eq(i).val())
+				}
+
 			}
 			return total_num
 
+		};
+
+		// 判定是否勾选，才让其进行加减或input框的改变
+		function judge_check($item){
+		    if($item.parent().parent().parent().find('.col01').find('input').is(':checked'))
+			{return true}
+			else{return false}
 		};
 
 //		删除时，发生click事件，发送ajax给服务器，删除此条数据
 		$('.col08 span').click(function(){
 		    // 定义全局变量，这样ajax的回调函数才能确定这个对象然后进行操作，否则无法确定this
 		    $ul = $(this).parent().parent()
+			tot_money = parseFloat($('.settlements .col03 em').text())
+			var $now_del = $(this)
 		    $.get('/center/cart_del/', {'gid':$(this).next().text()}, function(dat){
 				if(dat.res == 'ok'){
-				    $ul.hide();
-				    $('.total_count em').text($('.total_count em').text()-1)
-//					console.log($('input[name=left_check]').length)
+					tot_one = $now_del.parent().prev().find('span').text()
+					one_num = $now_del.parent().siblings('.col06').find('input').val()
 
+					is_check = $now_del.parent().siblings('.col01').find('input').is(':checked')
+
+					if(is_check){
+					    tot_all = $('.settlements .col03 em').text()
+						$('.settlements .col03 em').text((tot_all-tot_one).toFixed(2))
+						$('#num').text(parseInt($('#num').text())- parseInt(one_num))
+
+					}
+					$ul.html('');
 				}
 			})
 		});
 
 
-		// 确定是否勾选，然后进行加减
+		// 勾选单个商品时，然后进行加减
 		$('.cart_list_td .col01 input').click(function(){
 		    //console.log($(this).is(':checked'))
 			gprice = $(this).parent().parent().find('.col07').find('span').text()
-			tprice = $('.settlements .col03 em').text()
+			tprice = parseFloat($('.settlements .col03 em').text())
 
 
 			if (!$(this).is(':checked') ) {
@@ -207,42 +259,63 @@
 				tot_n = $(this).parent().parent().find('.col06').find('.num_add').find('input').val()
 				$('#num').text($('#num').text() - tot_n)
 				// 取出这个商品的总价，让下方的总价减去这个
-				tot = $(this).parent().parent().find('.col07').find('span').text()
+				tot = parseFloat($(this).parent().parent().find('.col07').find('span').text())
+				$('.settlements .col03 em').text((tprice-tot).toFixed(2))
 
-				$('.settlements .col03 em').text((tprice * 100 - tot * 100) / 100)
+				// 向服务器发送请求，告知将表中的isdelete，改为假删除
+				gid = $(this).parent().siblings('.col08').find('p').text()
+
+				$.get('/center/checked/',{'gid':gid}, function(dat){
+				    if(dat.res == 'ok'){console.log('enen')}})
 			}
 			else if ($(this).is(':checked') ) {
 				//console.log(parseInt($('#num').text())+1)
 				tot_n = $(this).parent().parent().find('.col06').find('.num_add').find('input').val()
 				$('#num').text(parseInt($('#num').text()) + parseInt(tot_n))
 
-				tot = $(this).parent().parent().find('.col07').find('span').text()
-				$('.settlements .col03 em').text((tprice * 100 + tot * 100) / 100)
+				tot = parseFloat($(this).parent().parent().find('.col07').find('span').text())
+
+				$('.settlements .col03 em').text((tprice+tot).toFixed(2))
+
 			}
 
-
+			all_check();
 
 		});
+
+		function all_check(){
+		// 当有一个勾取消时，下面的全选的勾就取消，当所有的勾都勾选时，全选的勾也勾上
+		box = $(':checkbox:not(#check_all)').length
+		check_box = $(':checked:not(#check_all)').length
+		if(box == check_box){
+		    $('#check_all').prop({'checked':true})
+		}
+		else{
+		    $('#check_all').prop({'checked':false})
+		}}
 
 		//下方全选按钮，或者反选全部
-		$('[name="sub_check"]').click(function(){
-		    if(! $('[name="sub_check"]').is(':checked')){
-		        $('[name="left_check"]').removeAttr('checked')
-				$('#num').text(0)
-				$('.settlements .col03 em').text('0.00')
-			}
-			else{
-		        $('[name="left_check"]').prop('checked', 'true')
+//		$('[name="sub_check"]').click(function(){
+//		    if(! $('[name="sub_check"]').is(':checked')){
+////		        $('[name="left_check"]').removeAttr('checked')
+////				$('#num').text(0)
+////				$('.settlements .col03 em').text('0.00')
+//			}
+//			else{
+//		        $('[name="left_check"]').prop('checked', 'true')
+//
+//				to_money = add_total()
+//				$('.settlements .col03 em').text(to_money)
+//
+//				tot_num = add_num()
+//				$('#num').text(tot_num)
+//
+//			}
+//
+//		});
 
-				to_money = add_total()
-				$('.settlements .col03 em').text(to_money)
+		// 提交订单，form表格submit
 
-				tot_num = add_num()
-				$('#num').text(tot_num)
-
-			}
-
-		});
 	});
 
 

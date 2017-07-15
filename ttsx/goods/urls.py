@@ -1,9 +1,15 @@
 from django.conf.urls import include, url
 
-from . import views
+
+from .views import *
+from .search_view import *
 
 urlpatterns = [
-    url(r'^$', views.index),
-    url(r'^list/(\d+)/(\d+)/$', views.list),
-    url(r'^list/(\d+)/detail/(\d+)/$', views.detail),
+    url(r'^$', index),
+    url(r'^list/(\d+)/(\d+)/(\d+)/$', list),
+    url(r'^list/(\d+)/detail/(\d+)/$', detail),
+
+
+    url(r'^search/?$', MySearchView.as_view()),
+
 ]

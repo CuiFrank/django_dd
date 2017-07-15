@@ -58,7 +58,7 @@
 			<div class="subtitle fl">
 				<span>|</span>
 				{%for goods in dic.clicklist%}
-				<a href="/list/{{dic.t1.id}}/1/">{{goods.title| truncatechars:10}}</a>
+				<a href="/list/{{dic.t1.id}}/1/1/">{{goods.title| truncatechars:10}}</a>
 				{%endfor%}
 
 			</div>
@@ -70,8 +70,8 @@
 			<ul class="goods_list fl">
 				{% for goods in dic.newlist%}
 				<li>
-					<h4><a href="/list/{{dic.t1.id}}/1/">{{goods.title}}</a></h4>
-					<a href="/list/{{dic.t1.id}}/1/"><img src="/static/media/{{goods.pic}}"></a>
+					<h4><a href="/list/{{dic.t1.id}}/1/1/">{{goods.title}}</a></h4>
+					<a href="/list/{{dic.t1.id}}/1/1/"><img src="/static/media/{{goods.pic}}"></a>
 					<div class="prize">¥ {{goods.price}}</div>
 				</li>
 				{% endfor %}

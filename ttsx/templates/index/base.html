@@ -5,7 +5,7 @@
 {% endblock head%}
 
 {% block first_line %}
-	{% if first_line == '1'%}
+	{% if first_line|default:'1' == '1'%}
 	{{block.super}}
 	{% endif %}
 {% endblock first_line %}
@@ -41,12 +41,12 @@
 	<div class="center_con clearfix">
         {%block nav%}
 		<ul class="subnav fl">
-			<li><a href="/list/1/1/" class="fruit">新鲜水果</a></li>
-			<li><a href="/list/2/1/" class="seafood">海鲜水产</a></li>
-			<li><a href="/list/3/1/" class="meet">猪牛羊肉</a></li>
-			<li><a href="/list/4/1/" class="egg">禽类蛋品</a></li>
-			<li><a href="/list/5/1/" class="vegetables">新鲜蔬菜</a></li>
-			<li><a href="/list/6/1/" class="ice">速冻食品</a></li>
+			<li><a href="/list/1/1/1/" class="fruit">新鲜水果</a></li>
+			<li><a href="/list/2/1/1/" class="seafood">海鲜水产</a></li>
+			<li><a href="/list/3/1/1/" class="meet">猪牛羊肉</a></li>
+			<li><a href="/list/4/1/1/" class="egg">禽类蛋品</a></li>
+			<li><a href="/list/5/1/1/" class="vegetables">新鲜蔬菜</a></li>
+			<li><a href="/list/6/1/1/" class="ice">速冻食品</a></li>
 		</ul>
         {% endblock nav%}
 		<div class="slide fl">

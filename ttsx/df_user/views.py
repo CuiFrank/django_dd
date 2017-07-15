@@ -60,31 +60,35 @@ def login_handle(request):
     sha1 = hashlib.sha1()
     sha1.update(upasswd.encode())
     upasswd_sha1 = sha1.hexdigest()
-
-    if user[0].passwd == upasswd_sha1:
-        path = request.session.get('url_path', '')
-        if path != '':
-            # response = redirect('/center/user_center_info/')
-            response = redirect(request.session['url_path'])
-        else:
-            response = redirect('/')
-        request.session['name'] = user[0].name
-        response.set_cookie('isLogin', user[0].id, expires=300)
-
-        if remember == '1':
-            response.set_cookie('name', uname, expires=datetime.datetime.now()+datetime.timedelta(days=14))
-        else:
-            # request.session.flush()  #删除session表中的数据
-            # del request.session[uname]
-            response.set_cookie('name', uname, expires=-1)
-        return response
-    else:
+    if len(user) == 0:
         return redirect('/user/login/')
+    else:
+        if user[0].passwd == upasswd_sha1:
+            path = request.session.get('url_path', '')
+            if path != '':
+                # response = redirect('/center/user_center_info/')
+                response = redirect(request.session['url_path'])
+            else:
+                response = redirect('/')
+            request.session['name'] = user[0].name
+            response.set_cookie('isLogin', user[0].id, expires=6000)
+
+            if remember == '1':
+                response.set_cookie('name', uname, expires=datetime.datetime.now()+datetime.timedelta(days=14))
+            else:
+                # request.session.flush()  #删除session表中的数据
+                # del request.session[uname]
+                response.set_cookie('name', uname, expires=-1)
+            return response
+        else:
+            return redirect('/user/login/')
 
 
 def logout(request):
     request.session.flush()
-    return redirect('/user/login/')
+    response = redirect('/user/login/')
+    response.set_cookie('isLogin', '',expires=-1)
+    return response
 
 
 

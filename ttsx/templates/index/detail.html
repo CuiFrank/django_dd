@@ -1,5 +1,6 @@
 {% extends 'index/base.html' %}
 {% block head%}
+
 {% endblock head%}
 
 
@@ -63,9 +64,8 @@
 			</div>
 			<div class="total">总价：<em>{{good.price}}元</em></div>
 			<div class="operate_btn">
-				<a href="javascript:;" class="buy_btn">立即购买</a>
-				<!--<a href="javascript:;" onclick='function(){return false;}' class="add_cart" id="add_cart">加入购物车</a>-->
-				<span class="add_cart" id="add_cart">加入购物车</span>
+				<a href="javascript:buy();" class="buy_btn">立即购买</a>
+				<a href="javascript:addcart();" class="add_cart" id="add_cart">加入购物车</a>
 				<em>添加购物车失败</em>
 			</div>
 		</div>
@@ -106,22 +106,43 @@
 
 	<div class="add_jump"></div>
 <script>
-//	发送ajax请求，告诉服务器，对购物信息存储
-	$(function(){
-	    $('#add_cart').click(function(){
+//	发送ajax请求，告诉服务器，对购物信息存储 // 由user_center中的views去处理，并返回jsonresponse
+	function addcart(){
 			num = $('.num_show').val();
 			bao = {{good.id}};
-			console.log(bao)
-	        $.get('/center/add_cart/', {'num':num, 'bao':bao}, function(dat){
-	            if(dat.res == 'ok'){alert('yes')}
-	            else{$('.operate_btn em').show()}
-			});
+			$.get('/center/is_login/',function(dat){
+			    if (dat.res == 'yes'){
+			        $.get('/center/add_cart/', {'num':num, 'bao':bao}, function(dat){
+						if(dat.res == 'ok'){
+							var $add_x = $('#add_cart').offset().top;
+							var $add_y = $('#add_cart').offset().left;
 
-		})
-	})
+							var $to_x = $('#show_count').offset().top;
+							var $to_y = $('#show_count').offset().left;
+
+							$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+							$(".add_jump").stop().animate({
+								'left': $to_y+7,
+								'top': $to_x+7},
+								"fast", function() {
+								$(".add_jump").fadeOut('fast',function(){
+								count = parseInt($('#show_count').html());
+								$('#show_count').html( count+1 );
+							});
+							});
+	            		}
+	            		else{$('.operate_btn em').show()}
+					});
+				}
+				else{
+			        location.href='/user/login/'
+				}
+			})
+
+
+		}
+
 </script>
-
-
 <script>
 	// 购物数量的加减操作，购物车小动画
 	$(function(){
@@ -168,49 +189,28 @@
 
 		})
 
-		var $add_x = $('#add_cart').offset().top;
-		var $add_y = $('#add_cart').offset().left;
+//		var $add_x = $('#add_cart').offset().top;
+//		var $add_y = $('#add_cart').offset().left;
+//
+//		var $to_x = $('#show_count').offset().top;
+//		var $to_y = $('#show_count').offset().left;
 
-		var $to_x = $('#show_count').offset().top;
-		var $to_y = $('#show_count').offset().left;
 
-
-		$('#add_cart').click(function(){
-		    $(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
-			$(".add_jump").stop().animate({
-				'left': $to_y+7,
-				'top': $to_x+7},
-				"fast", function() {
-					$(".add_jump").fadeOut('fast',function(){
-					    count = parseInt($('#show_count').html());
-						$('#show_count').html( count+1 );
-					});
-
-			});
-
-		})
+//		$('#add_cart').click(function(){
+//		    $(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+//			$(".add_jump").stop().animate({
+//				'left': $to_y+7,
+//				'top': $to_x+7},
+//				"fast", function() {
+//					$(".add_jump").fadeOut('fast',function(){
+//					    count = parseInt($('#show_count').html());
+//						$('#show_count').html( count+1 );
+//					});
+//
+//			});
+//
+//		})
 
 	})
 </script>
-	<!--<script type="text/javascript">-->
-		<!--var $add_x = $('#add_cart').offset().top;-->
-		<!--var $add_y = $('#add_cart').offset().left;-->
-
-		<!--var $to_x = $('#show_count').offset().top;-->
-		<!--var $to_y = $('#show_count').offset().left;-->
-
-		<!--$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})-->
-		<!--$('#add_cart').click(function(){-->
-			<!--$(".add_jump").stop().animate({-->
-				<!--'left': $to_y+7,-->
-				<!--'top': $to_x+7},-->
-				<!--"fast", function() {-->
-					<!--$(".add_jump").fadeOut('fast',function(){-->
-						<!--$('#show_count').html(2);-->
-					<!--});-->
-
-			<!--});-->
-		<!--})-->
-	<!--</script>-->
-	
 {% endblock body%}

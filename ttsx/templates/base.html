@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
 	<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+	<!--<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>-->
 
 	{% block head %} {% endblock head%}
 
@@ -19,8 +20,10 @@
 			<div class="fr">
 				{% if request.session.name %}
 				<div class="login_btn fl">
+
 					欢迎您：<em>{{request.session.name}}</em>
 					<a href="/user/logout/">退出</a>
+					&nbsp;&nbsp; |&nbsp;<a href="/">首页</a>
 				</div>
 				{% else %}
 				<div class="login_btn fl">
@@ -47,9 +50,15 @@
 	<div class="search_bar clearfix">
 		<a href="index.html" class="logo fl"><img src="/static/images/logo.png"></a>
 		<div class="search_con fl">
-			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
-			<input type="button" class="input_btn fr" name="" value="搜索">
+			<form method='get' action="/search/" target="_blank">
+				<input type="text" class="input_text fl" name="q" placeholder="搜索商品">
+				<input type="submit" class="input_btn fr" name="" value="搜索">
+			</form>
 		</div>
+
+
+
+
 		<div class="guest_cart fr">
 			<a href="/center/cart/" class="cart_name fl">我的购物车</a>
 			<div class="goods_count fl" id="show_count">{{tot_num}}</div>
@@ -62,6 +71,8 @@
 			{% block location %}
 			{% if location == '1' %}
 			购物车
+			{% elif location == '2' %}
+			提交订单
 			{% else %}
 			用户中心
 			{% endif %}

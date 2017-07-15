@@ -1,4 +1,7 @@
+
 {% extends 'index/base.html' %}
+
+{% load filters %}
 {% block head%}
 {% endblock head%}
 
@@ -17,6 +20,7 @@
 
 
 	{%block body%}
+{% block navbar%}
 	<div class="navbar_con">
 		<div class="navbar clearfix">
 			<div class="subnav_con fl">
@@ -31,6 +35,7 @@
 			{% endblock navlist%}
 		</div>
 	</div>
+{%endblock navbar%}
 	<div class="breadcrumb">
 		<a href="#">全部分类</a>
 		<span>></span>
@@ -38,6 +43,8 @@
 	</div>
 
 	<div class="main_wrap clearfix">
+		{% block third_left %}
+		{% if third_l == '3'%}
 		<div class="l_wrap fl clearfix">
 			<div class="new_goods">
 				<h3>新品推荐</h3>
@@ -53,41 +60,49 @@
 				</ul>
 			</div>
 		</div>
+		{%else%}
+		{%endif%}
+		{% endblock third_left %}
 
 		<div class="r_wrap fr clearfix">
-			<div class="sort_bar">
-				<a href="#" class="active">默认</a>
-				<a href="#">价格</a>
-				<a href="#">人气</a>
-			</div>
 
+
+			<div class="sort_bar">
+				<a href="/list/{{uid}}/1/1/" {%if orderby == '1' %}class="active" {% endif %}>默认</a>
+				<a href="/list/{{uid}}/1/2/?desc={{desc|judge}}" {% if orderby == '2' %}class="active" {% endif %}>价格</a>
+				<a href="/list/{{uid}}/1/3/"{%if orderby == '3' %}class="active" {% endif %}>人气</a>
+
+			</div>
+			{% block detail %}
 			<ul class="goods_type_list clearfix">
 
 				{% for goods in page.object_list %}
 				<li>
 					<a href="/list/{{uid}}/detail/{{goods.id}}/"><img src="/static/media/{{goods.pic}}"></a>
-					<h4><a href="detail.html">{{goods.title}}</a></h4>
+					<h4><a href="/list/{{uid}}/detail/{{goods.id}}/">{{goods.title}}</a></h4>
 					<div class="operate">
 						<span class="prize">￥{{goods.price}}</span>
 						<span class="unit">{{goods.price}}/{{goods.unit}}</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
+						<a href="javascript:add_goods();" class="add_goods" title="加入购物车"></a>
 					</div>
 				</li>
 				{% endfor %}
 			</ul>
 			<div class="pagenation">
+				<a href="/list/{{uid}}/1/{{orderby}}/" class="first">首页</a>
 				<a href="#" class="up"><上一页</a>
 				{% for pindex in page.paginator.page_range %}
 					{% if pindex == page.number %}
 					<a href="#" class="active" id="now">{{ pindex }}</a>
 
 					{% else %}
-					<a href="/list/{{uid}}/{{ pindex }}/" > {{ pindex }}</a>
+					<a href="/list/{{uid}}/{{ pindex }}/{{orderby}}/" class="other"> {{ pindex }}</a>
 
 					{% endif %}
 				{% endfor %}
 
 				<a href="#" class="down">下一页></a>
+				<a href="/list/{{uid}}/{{page.paginator.num_pages}}/{{orderby}}/" class="last">末页</a>
 			</div>
 
 
@@ -95,6 +110,19 @@
 
 		</div>
 	</div>
+<div class="mask">
+	<form method="post" action="/user/login_handle/">
+		{% csrf_token %}
+		帐号：<input type="text" name="username"> <br>
+		密码：<input type="password" name="userpwd">
+		<input type="submit" id="confirm" value="确认">
+	</form>
+</div>
+<style>
+	.mask{display:none;position:fixed;z-index:9999;height:100%;width:100%;opacity:0.4;}
+	.pagenation .other{display:none;}
+	/*.pagenation .up,.down{display:inline-block;}*/
+</style>
 <script>
 	$(function(){
 				//向上翻页
@@ -102,24 +130,67 @@
 				    now = $('#now').text()
 
 					if(parseInt(now)<=1){
-				        $('.up').prop({'href':'/list/{{uid}}/1/'})
+				        $('.up').prop({'href':'/list/{{uid}}/1/{{orderby}}/'})
 					}
 					else{
-					    $('.up').prop({'href':'/list/{{uid}}/'+(parseInt(now)-1)+'/'})
+					    $('.up').prop({'href':'/list/{{uid}}/'+(parseInt(now)-1)+'/{{orderby}}'})
+//							.parent().find('.active').show().siblings('.other').hide()
 					}
-				})
+
+				});
+				//显示部分页码, 控制显示上一页下一页首页和末页，利用了js中选择集选不到时可以容错
+				now = $('#now').text()
+				if(now=={{page.paginator.num_pages}} && now==1){$('#now').prev().show()
+					.prev().show().prev().show().prev().show().prev().show().prev().show();
+					$('.down').hide();$('.last').hide();$('.first').hide();$('.up').hide()}
+				else if(now=={{page.paginator.num_pages}} && now!=1){$('#now').prev().show()
+					.prev().show().prev().show().prev().show().prev().show().prev().show();
+					$('.down').hide();$('.last').hide()}
+				else if(now!={{page.paginator.num_pages}}){
+				    if(now>=5){$('#now').next().show().next().show().next().show();
+					$('#now').prev().show().prev().show().prev().show().prev().show();}
+				if(now==1){$('#now').next().show().next().show().next().show().next().show()
+					.next().show().next().show().next().show();$('.first').hide();$('.up').hide()}
+				if(now==2 || now==3 || now==4){$('.up').next().show().next().show().next().show().next().show()
+					.next().show().next().show().next().show().next().show();}
+
+		}
+
+
 				//向下翻页
 				$('.down').click(function(){
 				    now = $('#now').text()
 					if(parseInt(now) >= parseInt({{last_index}}))
-					{$('.down').prop({'href':'/list/{{uid}}/'+{{last_index}}+'/'})}
+					{$('.down').prop({'href':'/list/{{uid}}/'+{{last_index}}+'/{{orderby}}/'})}
 					else{
-				        $('.down').prop({'href':'/list/{{uid}}/'+(parseInt(now)+1)+'/'})
+				        $('.down').prop({'href':'/list/{{uid}}/'+(parseInt(now)+1)+'/{{orderby}}/'})
 					}
-				})
+
+				});
+
+//				$('#confirm').click(function(){
+//
+//				})
 
 
-			})
+
+			});
+
 </script>
+<script>
+	function add_goods(){
+	    //添加购物车时，判断是否登陆
 
+		var login_judge = $.cookie('isLogin');
+		console.log(login_judge);
+		if (login_judge == undefined){
+		    $('.mask').show()
+		}
+		else{
+		    alert('添加成功');
+		}
+
+	}
+</script>
+{% endblock detail%}
 	{%endblock body%}
