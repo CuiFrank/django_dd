@@ -2,37 +2,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>{{title}}</title>
+	<title></title>
 	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
 	<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
 	<!--<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>-->
 
-	{% block head %} {% endblock head%}
+	 
 
 
 </head>
 <body>
-
-	{% block first_line %}
+	
 	<div class="header_con">
 		<div class="header">
 			<div class="welcome fl">欢迎来到天天生鲜!</div>
 			<div class="fr">
-				{% if request.session.name %}
-				<div class="login_btn fl">
-
-					欢迎您：<em>{{request.session.name}}</em>
-					<a href="/user/logout/">退出</a>
-					&nbsp;&nbsp; |&nbsp;<a href="/">首页</a>
-				</div>
-				{% else %}
+				
 				<div class="login_btn fl">
 					<a href="/user/login/">登录</a>
 					<span>|</span>
 					<a href="/user/register/">注册</a>
 				</div>
-				{% endif %}
+				
 				<div class="user_link fl">
 					<span>|</span>
 					<a href="/center/user_center_info/">用户中心</a>
@@ -44,40 +36,17 @@
 			</div>
 		</div>
 	</div>
-	{% endblock first_line %}
-	{% block second_line %}
-	{% if second_line  == '2'%}
-
-	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="https://www.baidu.com/img/baidu_jgylogo3.gif"></a>
-		<div class="search_con fl">
-			<form method='get' action="/search/" target="_blank">
-				<input type="text" class="input_text fl" name="q" placeholder="搜索商品">
-				<input type="submit" class="input_btn fr" name="" value="搜索">
-			</form>
-		</div>
-
-
-
-
-		<div class="guest_cart fr">
-			<a href="/center/cart/" class="cart_name fl">我的购物车</a>
-			<div class="goods_count fl" id="show_count">{{tot_num}}</div>
-		</div>
-	</div>
-	{% else %}
+	
+	
+	
 	<div class="search_bar clearfix">
 		<a href="index.html" class="logo fl"><img src="/static/images/logo.png"></a>
 		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;
-			{% block location %}
-			{% if location == '1' %}
-			购物车
-			{% elif location == '2' %}
-			提交订单
-			{% else %}
+			
+			
 			用户中心
-			{% endif %}
-			{% endblock location%}
+			
+			
 		</div>
 		<div class="search_con fr">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
@@ -85,10 +54,10 @@
 		</div>
 	</div>
 
-	{% endif %}
-	{% endblock second_line%}
+	
+	
 
-	{% block left%}
+	
 
 	<div class="main_con clearfix">
 		<div class="left_menu_con clearfix">
@@ -100,10 +69,10 @@
 			</ul>
 		</div>
 
-	{% endblock left%}
+	
 
-    {% block body%}
-    {% endblock body%}
+    
+    
 
 	<div class="footer no-mp">
 		<div class="foot_link">
@@ -118,8 +87,6 @@
 		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
 		<p>电话：010-****888    京ICP备*******8号</p>
 	</div>
-	<img src="https://www.baidu.com/img/baidu_jgylogo3.gif">
-		<img src="http://192.168.141.149:8000/static/images/adv01.jpg" >
+
 </body>
 </html>
-

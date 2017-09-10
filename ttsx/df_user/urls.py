@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^register_handle/$', views.register_handle),
     url(r'^login_handle/$', views.login_handle),
     url(r'^logout/$', views.logout),
+    url(r'^myemail/$', views.my_email),
 
 ]
